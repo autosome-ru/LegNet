@@ -40,4 +40,4 @@ File location and link |
 [complex_medium_Native.csv](https://zenodo.org/record/4436477/files/Native_complex.csv?download=1)
 [Native_test_DanQ_model.csv](https://github.com/1edv/evolution/blob/master/manuscript_code/model/results_summary/Native_test_DanQ_model.csv)
 [Native_test_DeepAtt_model.csv](https://github.com/1edv/evolution/blob/master/manuscript_code/model/results_summary/Native_test_DeepAtt_model.csv)
-[Native_test_DeepSEA_model.csv](https://github.com/1edv/evolution/blob/master/manuscript_code/model/results_summary/Native_test_DeepSEA_model.csv
+[Native_test_DeepSEA_model.csv](https://github.com/1edv/evolution/blob/master/manuscript_code/model/results_summary/Native_test_DeepSEA_model.csv)
