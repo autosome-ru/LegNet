@@ -1,0 +1,20 @@
+ python train.py --seed 42\
+  --use_single_channel\
+  --use_reverse_channel\
+  --kernel_size 7\
+  --filter_per_group 2\
+  --res_block_type concat\
+  --se_type complex\
+  --inner_dim_calculation out\
+  --final_activation silu\
+  --blocks 256 128 128 64 64 64 64\
+  --train_mode classification\
+  --optimizer adamw\
+  --scheduler onecycle\
+  --lr 0.005\
+  --wd 0.01\
+  --split_type trainvalid\
+  --dataset_path "/home/penzard/dream_data/dreamdata/contest_data/train_sequences.txt"\
+  --reverse_augment\
+  --model_dir try\
+  --valid_folds 9
