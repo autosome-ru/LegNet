@@ -1,4 +1,5 @@
 import argparse
+from random import choice
 
 from dream_lightning_wrapper import LegNetConfig, TrainingSchemeConfig
 from dream_datamodule import DreamDataModuleConfig
@@ -149,10 +150,26 @@ run_args.add_argument("--precision",
 run_args.add_argument("--train_log_every_n_steps",
                       default=50,
                       type=int)
+run_args.add_argument("--fmt_precision",
+                      default=4,
+                      type=int)
+run_args.add_argument("--save_k_best",
+                      default=1,
+                      type=int)
+run_args.add_argument("--metric",
+                      choices=['val_pearson', 
+                               'val_loss', 
+                               'val_pearson'],
+                      default="val_pearson",
+                      type=str)
+run_args.add_argument("--direction",
+                      choices=['min', 'max'],
+                      default="max",
+                      type=str)
 
 
 args = parser.parse_args()
-
+ 
 experiment = Experiment(
     model_cfg = LegNetConfig(
         use_single_channel=args.use_single_channel,
@@ -193,7 +210,11 @@ experiment = Experiment(
         devices=[args.device],
         precision=args.precision,
         model_dir=args.model_dir,
-        train_log_every_n_steps=args.train_log_every_n_steps),
+        train_log_every_n_steps=args.train_log_every_n_steps,
+        fmt_precision=args.fmt_precision,
+        k_best=args.save_k_best,
+        metric=args.metric,
+        direction=args.direction),
     global_seed=args.seed,
     set_medium_float32_precision=True,
     train_log_step=args.train_log_step)

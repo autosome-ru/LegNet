@@ -2,7 +2,7 @@ from gc import callbacks
 import lightning.pytorch as pl 
 
 from dataclasses import dataclass
-
+from iterative_checkpoint_callback import IterativeCheckpointCallback
 @dataclass
 class RunConfig:
     max_steps: int
@@ -12,6 +12,10 @@ class RunConfig:
     precision: str 
     model_dir: str
     train_log_every_n_steps: int = 50
+    fmt_precision: int = 4
+    k_best: int = 1
+    metric: str = "val_pearson"
+    direction: str = "max"
     
     def get_trainer(self, 
                     validation_exists: bool, 
@@ -23,14 +27,10 @@ class RunConfig:
         callbacks.append(lr_monitor)
 
         if validation_exists:
-            best_checkpoint_callback = pl.callbacks.ModelCheckpoint( # type: ignore
-                save_top_k=1,
-                monitor="val_pearson",
-                mode="max",
-                filename="pearson-{val_pearson:.2f}",
-                save_on_train_epoch_end=False,
-                every_n_train_steps=save_every_n_train_steps
-            )
+            best_checkpoint_callback = IterativeCheckpointCallback(monitor=self.metric, 
+                                                                   k_best=self.k_best, 
+                                                                   direction=self.direction,
+                                                                   fmt_precision=self.fmt_precision)
             callbacks.append(best_checkpoint_callback)
         
         last_checkpoint_callback = pl.callbacks.ModelCheckpoint(   #type: ignore
@@ -42,7 +42,7 @@ class RunConfig:
             every_n_train_steps=save_every_n_train_steps,
         )
         callbacks.append(last_checkpoint_callback)
-        
+
         return pl.Trainer(
             max_steps=self.max_steps,
             val_check_interval=self.val_check_interval,
