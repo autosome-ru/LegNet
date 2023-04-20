@@ -34,6 +34,7 @@ class SeqDataset(Dataset):
     return_probs: bool
     shift: float | None
     scale: float | None
+    return_bin: bool
     
     POINTS: ClassVar[np.ndarray] = np.array([-np.inf, *range(1, 18, 1), np.inf])
     
@@ -53,6 +54,7 @@ class SeqDataset(Dataset):
         self.return_probs = return_probs
         self.shift = shift
         self.scale = scale
+        self.return_bin = return_bin
         if self.return_probs:
             if self.shift is None or self.scale is None:
                 raise Exception("To return probs, both shift and scale must be provided")

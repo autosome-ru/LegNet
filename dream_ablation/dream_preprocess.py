@@ -45,9 +45,9 @@ def add_singleton_column(df, mode: str="infer"):
         if pd.isnull(df.bin).sum() != 0:
              raise Exception("For infer singleton mode, bin column shouldn't contain nulls")
         df["is_singleton"] = infer_singleton(df.bin.values)
-    elif mode == "all_0":
+    elif mode == "no_singletons":
         df["is_singleton"] = 0
-    elif mode == "all_1":
+    elif mode == "all_singletons":
         df["is_singleton"] = 1
     else:
         raise Exception(f"Wrong singleton mode: {mode}")

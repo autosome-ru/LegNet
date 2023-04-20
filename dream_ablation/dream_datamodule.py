@@ -21,6 +21,7 @@ class DreamTrainValDataModule(pl.LightningDataModule):
                  valid_folds: list[int],
                  add_single_column: bool, 
                  reverse_augment: bool, 
+                 model_cfg: LegNetConfig,
                  seqsize: int = 150,
                  shift: float = 0.5,
                  scale: float = 0.5,
@@ -40,6 +41,7 @@ class DreamTrainValDataModule(pl.LightningDataModule):
         self.add_single_column = add_single_column
         self.reverse_augment = reverse_augment
         self.hash_seed = hash_seed
+        self.model_cfg = model_cfg
 
     def setup(self, stage: str):
         dataset = pd.read_table(self.dataset_path, 
@@ -61,7 +63,7 @@ class DreamTrainValDataModule(pl.LightningDataModule):
         self.train_ds = SeqDataset(self.train, 
                          size=self.seqsize, 
                          add_single_channel=self.add_single_column,
-                         add_reverse_channel=self.reverse_augment,
+                         add_reverse_channel=self.model_cfg.use_reverse_channel,
                          return_probs=True,
                          shift=self.shift,
                          scale=self.scale)
@@ -69,7 +71,7 @@ class DreamTrainValDataModule(pl.LightningDataModule):
         self.valid_ds = SeqDataset(self.valid, 
                          size=self.seqsize, 
                          add_single_channel=self.add_single_column,
-                         add_reverse_channel=self.reverse_augment,
+                         add_reverse_channel=self.model_cfg.use_reverse_channel,
                          return_probs=False)
     
     
@@ -90,6 +92,7 @@ class DreamFullTrainDataModule(pl.LightningDataModule):
                  dataset_path: str,
                  add_single_column: bool, 
                  reverse_augment: bool, 
+                 model_cfg: LegNetConfig,
                  seqsize: int = 150,
                  shift: float = 0.5,
                  scale: float = 0.5,
@@ -104,8 +107,8 @@ class DreamFullTrainDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.add_single_column = add_single_column
         self.reverse_augment = reverse_augment
-        self.save_hyperparameters()   
-    
+        self.model_cfg = model_cfg
+        
     def setup(self, stage: str):
         dataset = pd.read_table(self.dataset_path, 
                                     sep='\t', 
@@ -118,7 +121,7 @@ class DreamFullTrainDataModule(pl.LightningDataModule):
         self.full_ds = SeqDataset(self.dataset, 
                          size=self.seqsize, 
                          add_single_channel=self.add_single_column,
-                         add_reverse_channel=self.reverse_augment,
+                         add_reverse_channel=self.model_cfg.use_reverse_channel,
                          return_probs=True,
                          shift=self.shift,
                          scale=self.scale,)
@@ -152,7 +155,7 @@ class DreamDataModuleConfig:
         else:
             return True
     
-    def get_datamodule(self) -> pl.LightningDataModule:
+    def get_datamodule(self, model_cfg: LegNetConfig) -> pl.LightningDataModule:
         if self.split_type == "fulltrain":
             return DreamFullTrainDataModule(dataset_path=self.dataset_path,
                                             add_single_column=self.add_single_column,
@@ -161,7 +164,8 @@ class DreamDataModuleConfig:
                                             shift=self.shift,
                                             scale=self.scale,
                                             train_batch_size=self.train_batch_size,
-                                            num_workers=self.num_workers)
+                                            num_workers=self.num_workers,
+                                            model_cfg=model_cfg)
         elif self.split_type == "trainvalid":
             assert len(self.valid_folds) > 0, "For trainvalid split type at least one validation fold required"
             return DreamTrainValDataModule(dataset_path=self.dataset_path,
@@ -174,7 +178,8 @@ class DreamDataModuleConfig:
                                            train_batch_size=self.train_batch_size,
                                            valid_batch_size=self.valid_batch_size,
                                            num_workers=self.num_workers,
-                                           hash_seed=self.fold_hash_seed)
+                                           hash_seed=self.fold_hash_seed,
+                                            model_cfg=model_cfg)
         else:
             raise Exception("Wrong datamodule type")
     

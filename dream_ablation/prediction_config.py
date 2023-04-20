@@ -17,7 +17,7 @@ class PredictionConfig:
     devices: list[int]
     out_dir: str
     
-    PREDICTION_FILE_NAME: ClassVar[str] = "pred.tsv"
+    PREDICTION_FILE_NAME: ClassVar[str] = "submission.txt"
     PRED_CONFIG_FILE_NAME: ClassVar[str] = "pred_params.json"
     
     
@@ -46,7 +46,8 @@ class PredictionConfig:
                 logdir=self.out_dir)
         df.to_csv(self.prediction_path, 
             sep="\t", 
-            index=False)
+            index=False,
+            header=False)
         
     
     @property

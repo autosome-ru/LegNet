@@ -37,7 +37,7 @@ class Experiment:
             torch.set_float32_matmul_precision('medium') 
         model = self.get_lt_model()
         
-        data = self.data_cfg.get_datamodule()
+        data = self.data_cfg.get_datamodule(self.model_cfg)
         trainer = self.run_cfg.get_trainer(validation_exists=self.data_cfg.validation_exists,
                                            save_every_n_train_steps=self.train_log_step)
         trainer.fit(model, data)

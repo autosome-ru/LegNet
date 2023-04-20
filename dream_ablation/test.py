@@ -21,7 +21,7 @@ parser.add_argument("--out_dir",
                     type=str,
                     required=True)
 parser.add_argument("--singleton_mode",
-                    choices=["infer", 'all_1', 'all_0'],
+                    choices=["infer", 'all_singletons', 'no_singletons'],
                     type=str, 
                     required=True)
 parser.add_argument("--device", type=int, required=True)
