@@ -1,7 +1,10 @@
 from dataclasses import dataclass, asdict 
 
 import json
+from typing import ClassVar
 import torch
+
+import pandas as pd
 
 from pathlib import Path
 from dataclasses import dataclass, asdict 
@@ -21,26 +24,73 @@ class Experiment:
     set_medium_float32_precision: bool = True 
     train_log_step: int = 1000
     
+    CONFIG_PATH_NAME: ClassVar[str] = 'params.json'
+    
     def run(self):
+        self.check_params()
+        self.root_dir.mkdir(parents=True)
         self.dump()
         set_global_seed(self.global_seed)
         if self.set_medium_float32_precision:
             torch.set_float32_matmul_precision('medium') 
-            
-        model = DreamModel(model_cfg=self.model_cfg,
-                   train_cfg=self.train_scheme_cfg,
-                   train_log_step=self.train_log_step,
-                   for_lr_finder=False)
+        model = self.get_lt_model()
+        
         data = self.data_cfg.get_datamodule()
         trainer = self.run_cfg.get_trainer(validation_exists=self.data_cfg.validation_exists,
                                            save_every_n_train_steps=self.train_log_step)
         trainer.fit(model, data)
+        
+    def predict(self, 
+                seqs: str| Path,
+                model_path: str | Path,
+                singleton_mode: str,
+                logdir: str,
+                total_pred_col: str="bin"):
+        if self.set_medium_float32_precision:
+            torch.set_float32_matmul_precision('medium') 
+        model = self.get_lt_model_from_checkpoint(checkpoint_path=model_path)
+       
+        
+        seq_df, dl_iter = self.data_cfg.dls_for_predictions(seqs,
+                                                   self.model_cfg,
+                                                   singleton_mode=singleton_mode)
+        runner = self.run_cfg.get_predict_runner(logdir)
+        pred_cols = []
+        for name, dl in dl_iter:
+            predictions = runner.predict(model, dl)
+            predictions = torch.concat(predictions) # type: ignore
+            predictions = predictions.numpy()
+            seq_df[name] = predictions
+            pred_cols.append(name)
+        
+        seq_df[total_pred_col] = seq_df[pred_cols].mean(axis=1)    
+        return seq_df
+
+        
+    def get_lt_model(self):
+        model = DreamModel(model_cfg=self.model_cfg,
+                   train_cfg=self.train_scheme_cfg,
+                   train_log_step=self.train_log_step,
+                   for_lr_finder=False)
+        return model
+    
+    def get_lt_model_from_checkpoint(self, checkpoint_path: str | Path):
+        model = DreamModel.load_from_checkpoint(
+                   checkpoint_path=checkpoint_path,
+                   model_cfg=self.model_cfg,
+                   train_cfg=self.train_scheme_cfg,
+                   train_log_step=self.train_log_step,
+                   for_lr_finder=False)
+        return model
 
     @property
     def root_dir(self) -> Path:
         return Path(self.run_cfg.model_dir)
     
-   
+    @property
+    def experiment_config_path(self) -> Path:
+        return self.root_dir / self.CONFIG_PATH_NAME
+    
     def check_params(self): 
         if self.root_dir.exists():
             raise Exception(f"Model dir already exists: {self.root_dir}")
@@ -49,13 +99,8 @@ class Experiment:
                 raise Exception("If model use reverse channel"
                                 "reverse augmentation must be performed")
                 
-    def __post_init__(self):
-        self.check_params()
-        self.root_dir.mkdir(parents=True)
-        
     def dump(self):
-        p = self.root_dir / 'params.json'
-        self.to_json(p)
+        self.to_json(self.experiment_config_path)
         
     def to_dict(self) -> dict:
         dt = asdict(self)

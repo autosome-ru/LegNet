@@ -44,7 +44,8 @@ class SeqDataset(Dataset):
                  add_reverse_channel: bool,
                  return_probs: bool,
                  shift: float | None = None, 
-                 scale: float | None = None):
+                 scale: float | None = None,
+                 return_bin: bool=True):
         self.ds = ds
         self.size = size
         self.add_single_channel = add_single_channel
@@ -55,6 +56,9 @@ class SeqDataset(Dataset):
         if self.return_probs:
             if self.shift is None or self.scale is None:
                 raise Exception("To return probs, both shift and scale must be provided")
+            if not self.return_bin:
+                raise Exception("Return bin must be true if return porbs set to true")
+        self.return_bin = return_bin
         self.totensor = Seq2Tensor() 
         
     def transform(self, x):
@@ -81,7 +85,10 @@ class SeqDataset(Dataset):
             
         X = torch.concat(to_concat)
         
-        bin = self.ds.bin.values[i]
+        if not self.return_bin:
+           return X  
+       
+        bin = self.ds.bin.values[i] 
         if self.return_probs:
             probs = self.bin2prob(bin)
             return X, probs, bin 
@@ -90,5 +97,6 @@ class SeqDataset(Dataset):
     
     def __len__(self):
         return len(self.ds.seq)
+
     
 

@@ -1,13 +1,19 @@
 from curses import use_default_colors
 import pandas as pd 
+from pathlib import Path
 
 import lightning.pytorch as pl
 
 from torch.utils.data import DataLoader
 from dataclasses import dataclass, field
 
-from dream_preprocess import preprocess_data, add_singleton_column, add_rev, add_fold_column
+from dream_preprocess import (preprocess_data, 
+                              add_singleton_column, 
+                              add_rev, 
+                              add_fold_column, 
+                              make_rev)
 from dream_dataset import SeqDataset
+from dream_lightning_wrapper import LegNetConfig
 
 class DreamTrainValDataModule(pl.LightningDataModule):
     def __init__(self, 
@@ -171,4 +177,56 @@ class DreamDataModuleConfig:
                                            hash_seed=self.fold_hash_seed)
         else:
             raise Exception("Wrong datamodule type")
+    
+    def dls_for_predictions(self,
+                        seqs: str | Path,
+                        model_cfg: LegNetConfig,
+                        singleton_mode: str):
+        
+        seq_df = pd.read_csv(seqs, 
+                             sep="\t",
+                             header=None)   
+        assert len(seq_df.columns) < 3, "sequence table must contain at most 2 columns - seq and bin"
+        
+        seq_df.columns = ['seq', 'bin'][:len(seq_df.columns)]
+        initial_df = seq_df.copy()
+        seq_df = preprocess_data(seq_df, self.seqsize)
+        seq_df = add_singleton_column(seq_df, mode=singleton_mode)
+        
+        return initial_df, self._gen_dls_for_predictions(seq_df=seq_df,
+                                                     model_cfg=model_cfg)
+        
+    def _make_pred_dl(self, df: pd.DataFrame, model_cfg: LegNetConfig, rev: int):
+        df = df.copy()
+        df['rev'] = rev
+        ds = SeqDataset(df,
+                             size=self.seqsize, 
+                             add_single_channel=self.add_single_column,
+                             add_reverse_channel=model_cfg.use_reverse_channel,
+                             return_probs=False)
+        dl = DataLoader(dataset=ds, 
+                        batch_size=self.valid_batch_size,
+                        num_workers=self.num_workers,
+                        shuffle=False)
+        return dl
+        
+    def _gen_dls_for_predictions(self,
+                                 seq_df: pd.DataFrame, 
+                                 model_cfg: LegNetConfig):
+        forw_dl = self._make_pred_dl(df=seq_df, model_cfg=model_cfg, rev=0)
+        yield "forw", forw_dl
+       
+        if self.reverse_augment:
+            rev_df = make_rev(seq_df)  
+            rev_dl = self._make_pred_dl(df=rev_df,
+                                        model_cfg=model_cfg, 
+                                        rev=1)
+            yield "rev", rev_dl
+            
+        
+        
+        
+        
+        
+       
     

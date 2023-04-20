@@ -237,7 +237,15 @@ class DreamModel(pl.LightningModule):
                  on_step=False, 
                  on_epoch=True, 
                  logger=True)
-    
+        
+    def predict_step(self, batch, _):
+        X, _ = batch
+        preds = self.model(X)
+        if isinstance(preds, tuple):
+            score = preds[-1]
+        else:
+            score = preds
+        return score
     
     def configure_optimizers(self):
         optimizer = self.train_cfg.get_optimizer(self)

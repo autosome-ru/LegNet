@@ -1,6 +1,5 @@
-from gc import callbacks
 import lightning.pytorch as pl 
-
+from pathlib import Path
 from dataclasses import dataclass
 from iterative_checkpoint_callback import IterativeCheckpointCallback
 @dataclass
@@ -56,3 +55,9 @@ class RunConfig:
             log_every_n_steps=self.train_log_every_n_steps,
             enable_checkpointing=True,
         )
+        
+    def get_predict_runner(self, logdir: str | Path):
+        runner = pl.Trainer(accelerator=self.accelerator,
+                             devices=self.devices,
+                             default_root_dir=logdir)
+        return runner

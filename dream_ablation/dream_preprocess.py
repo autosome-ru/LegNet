@@ -14,16 +14,20 @@ PLASMID = "aactctcaaggatcttaccgctgttgagatccagttcgatgtaacccactcgtgcacccaactgatctt
 PLASMID = PLASMID.upper()
 INSERT_START = PLASMID.find('N'*80)
 
+def make_rev(df: pd.DataFrame) -> pd.DataFrame:
+    revdf = df.copy()
+    revdf['seq'] = df.seq.apply(revcomp)
+    return revdf
+
 def add_rev(df: pd.DataFrame, mode: str):
     df = df.copy()
-    if mode == "train" or mode == "test":
-        revdf = df.copy()
-        revdf['seq'] = df.seq.apply(revcomp)
-        df['rev'] = 0
+    df['rev'] = 0
+    if mode == "train" :
+        revdf = make_rev(df)
         revdf['rev'] = 1
         df = pd.concat([df, revdf]).reset_index(drop=True)
     elif mode == "valid":
-        df['rev'] = 0 
+        pass
         # no need to add reverse sequences for validation
         # as no averaging is performed at validation stage
     else:
@@ -33,9 +37,20 @@ def add_rev(df: pd.DataFrame, mode: str):
 def infer_singleton(arr):
     return np.array([x.is_integer() for x in arr])
 
-def add_singleton_column(df):
+def add_singleton_column(df, mode: str="infer"):
     df = df.copy()
-    df["is_singleton"] = infer_singleton(df.bin.values)
+    if mode == 'infer':
+        if not 'bin' in df.columns:
+            raise Exception("For infer singleton mode, dataframe must contain bin column")
+        if pd.isnull(df.bin).sum() != 0:
+             raise Exception("For infer singleton mode, bin column shouldn't contain nulls")
+        df["is_singleton"] = infer_singleton(df.bin.values)
+    elif mode == "all_0":
+        df["is_singleton"] = 0
+    elif mode == "all_1":
+        df["is_singleton"] = 1
+    else:
+        raise Exception(f"Wrong singleton mode: {mode}")
     return df 
 
 def hash_fun(seq, seed):
