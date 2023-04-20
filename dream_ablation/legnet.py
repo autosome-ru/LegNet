@@ -61,12 +61,16 @@ class LegNet(nn.Module):
         self.inner_dim_calculation= inner_dim_calculation
         self.res_block_type = res_block_type
         
+
         if res_block_type == "concat":
             residual = ResidualConcat
+            local_multiplier = 2
         elif res_block_type == "add":
             residual = Residual
+            local_multiplier = 1
         elif res_block_type == "none":
             residual = lambda x : x
+            local_multiplier = 1
         else:
             raise NotImplementedError()    
         
@@ -86,7 +90,7 @@ class LegNet(nn.Module):
                          filter_per_group=self.filter_per_group,
                          se_type=se_type,
                          inner_dim_calculation=inner_dim_calculation)),
-                LocalBlock(in_ch=2 * prev_sz,
+                LocalBlock(in_ch=local_multiplier * prev_sz,
                                out_ch=sz,
                                ks=ks,
                                activation=activation)
