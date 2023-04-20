@@ -12,13 +12,14 @@ class PredictionConfig:
     seqs_path: str
     pred_col: str
     experiment_path: str 
-    model_path: str
+    model: str
     singleton_mode: str
     devices: list[int]
     out_dir: str
     
     PREDICTION_FILE_NAME: ClassVar[str] = "pred.tsv"
     PRED_CONFIG_FILE_NAME: ClassVar[str] = "pred_params.json"
+    
     
     def run(self):
         if Path(self.out_dir).exists():
@@ -27,14 +28,26 @@ class PredictionConfig:
         self.dump()
         
         exp = Experiment.from_json(self.experiment_cfg)
+        
+        if self.model == "best":
+            model_path = exp.best_model_path(self.experiment_path)
+        elif self.model == "last":
+            model_path = exp.last_model_path(self.experiment_path)
+        else:
+            model_path = self.model
+        
+        if not Path(model_path).exists():
+            raise Exception(f"No such model path: {model_path}")
+        
         df = exp.predict(seqs=self.seqs_path,
-                model_path=self.model_path,
+                model_path=model_path,
                 singleton_mode=self.singleton_mode,
                 total_pred_col=self.pred_col,
                 logdir=self.out_dir)
         df.to_csv(self.prediction_path, 
             sep="\t", 
             index=False)
+        
     
     @property
     def experiment_cfg(self):

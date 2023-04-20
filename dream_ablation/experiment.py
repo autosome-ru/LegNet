@@ -1,5 +1,4 @@
-from dataclasses import dataclass, asdict 
-
+import glob
 import json
 from typing import ClassVar
 import torch
@@ -25,6 +24,9 @@ class Experiment:
     train_log_step: int = 1000
     
     CONFIG_PATH_NAME: ClassVar[str] = 'params.json'
+    MODELS_PATH: ClassVar[str] = 'lightning_logs/version_0/checkpoints/'
+    LAST_MODEL_PREF: ClassVar[str] = 'last_model' # this can be refactored but not now
+    BEST_MODEL_PREF: ClassVar[str] = 'model_'
     
     def run(self):
         self.check_params()
@@ -82,6 +84,31 @@ class Experiment:
                    train_log_step=self.train_log_step,
                    for_lr_finder=False)
         return model
+
+    def last_model_path(self, exp_root_path: str | Path) -> Path:
+        #Can't use self.root_path as paths may have changed
+        
+        exp_root_path = Path(exp_root_path)
+        pat = str(exp_root_path / self.MODELS_PATH / f"{self.LAST_MODEL_PREF}*")
+        paths = glob.glob(pat)
+        if len(paths) == 0:
+            raise Exception(f"No last models found: {pat}")
+        if len(paths) > 1:
+            raise Exception(f"More than 1 last model found: {pat}")
+        path = Path(paths[0])
+        return path
+    
+    def best_model_path(self, exp_root_path: str | Path) -> Path:
+        #Can't use self.root_path as paths may have changed
+        exp_root_path = Path(exp_root_path)
+        pat = str(exp_root_path / self.MODELS_PATH / f"{self.BEST_MODEL_PREF}*")
+        paths = glob.glob(pat)
+        if len(paths) == 0:
+            raise Exception(f"No best models found: {pat}")
+        if len(paths) > 1:
+            raise Exception(f"More than 1 best models found: {pat}")
+        path = Path(paths[0])
+        return path
 
     @property
     def root_dir(self) -> Path:
