@@ -57,7 +57,7 @@ class PromotersData(Dataset):
         seq_list = [n2id(i) for i in seq]
         code_target = torch.from_numpy(np.array(seq_list))
         code_target = F.one_hot(code_target, num_classes=5)
-        code_target[code_target[:, 4] == 1] = 0.25
+        code_target[code_target[:, 4] == 1] = 0
         seqs_target_encode = (code_target[:, :4].float()).transpose(0, 1)
         
         mut_num = torch.randint(low=self.limits[0], high=self.limits[1], size=(1,))
