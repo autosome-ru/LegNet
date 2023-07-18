@@ -73,19 +73,21 @@ def n2compl(n):
     return COMPL[n.upper()]
 
 class Seq2Tensor(nn.Module):
+    '''
+    Encode sequences using one-hot encoding after preprocessing.
+    '''
     def __init__(self):
         super().__init__()
-    def forward(self, seq):
-        if isinstance(seq, torch.FloatTensor):
-            return seq
-        seq = [n2id(x) for x in seq]
-        code = torch.from_numpy(np.array(seq))
-        code = F.one_hot(code, num_classes=5)
-        
-        code[code[:, 4] == 1] = 0.25
-        code = code[:, :4].float()
-        return code.transpose(0, 1)
 
+    def forward(self, seq: str) -> torch.Tensor:
+        seq_i = [n2id(x) for x in seq]
+        code = torch.from_numpy(np.array(seq_i))
+        code = F.one_hot(code, num_classes=5) # 5th class is N
+
+        code = code[:, :5].float()
+        code[code[:, 4] == 1] = 0.25 # encode Ns with .25
+        code =  code[:, :4]
+        return code.transpose(0, 1)
 
 def parameter_count(model):
     pars = 0  
