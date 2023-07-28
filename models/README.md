@@ -1,0 +1,5 @@
+Model weights for an original LegNet model are located in [complex](complex) and [defined](defined) folders. Model weights used in the final solution of DREAM2022 challenge are located in the [dream2022](dream2022) folder. These are compatible with PyTorch code which can be found in the [main legnet model code](../legnet/) and in the corresponding [tutorial](../tutorial/demo_notebook.ipynb). Files are named `model_x.pth` where x corresponds to epoch number.
+
+Model weights for a diffusion model are located in [diffusion](../diffusion/models/) folder. 
+
+Model weights for an optimized LegNet architecture are located in [optimized](optimized) folder. These are compatible with PyTorch Lightning code which can be found in [ablation code](../dream_ablation/) and in the corresponding [tutorial](../tutorial/demo_notebook_optimized.ipynb).

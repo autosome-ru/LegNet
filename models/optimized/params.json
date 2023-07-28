@@ -1,0 +1,67 @@
+{
+    "model_cfg": {
+        "use_single_channel": true,
+        "use_reverse_channel": true,
+        "block_sizes": [
+            256,
+            128,
+            128,
+            64,
+            64,
+            64,
+            64
+        ],
+        "ks": 7,
+        "resize_factor": 4,
+        "activation": "silu",
+        "final_activation": "none",
+        "filter_per_group": 1,
+        "se_reduction": 4,
+        "res_block_type": "concat",
+        "se_type": "simple",
+        "inner_dim_calculation": "in"
+    },
+    "train_scheme_cfg": {
+        "train_mode": "classification",
+        "optimizer_type": "lion",
+        "lr": 0.0005,
+        "weight_decay": 0.1,
+        "scheduler": "onecycle",
+        "cycle_momentum": false,
+        "lr_div": 25.0,
+        "pct_start": 0.3,
+        "three_phase": false
+    },
+    "data_cfg": {
+        "split_type": "fulltrain",
+        "dataset_path": "/home/penzard/dream_data/dreamdata/contest_data/train_sequences.txt",
+        "add_single_column": true,
+        "reverse_augment": true,
+        "seqsize": 150,
+        "shift": 0.5,
+        "scale": 0.5,
+        "train_batch_size": 1024,
+        "valid_batch_size": 4096,
+        "num_workers": 16,
+        "valid_folds": [],
+        "fold_hash_seed": 42
+    },
+    "run_cfg": {
+        "max_steps": 80000,
+        "val_check_interval": 1000,
+        "accelerator": "gpu",
+        "devices": [
+            0
+        ],
+        "precision": "bf16-mixed",
+        "model_dir": "chosen_lion",
+        "train_log_every_n_steps": 50,
+        "fmt_precision": 4,
+        "k_best": 1,
+        "metric": "val_pearson",
+        "direction": "max"
+    },
+    "global_seed": 42,
+    "set_medium_float32_precision": true,
+    "train_log_step": 1000
+}
