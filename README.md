@@ -8,6 +8,8 @@ Our approach secured 1st place in the recent [DREAM 2022 challenge in predicting
 
 - A [tutorial Jupyter notebook](tutorial/demo_notebook.ipynb) demonstrating how LegNet can be practically used with the data from yeast gigantic parallel reporter assays.
 
+- A [tutorial Jupyter notebook](tutorial/demo_notebook_optimized.ipynb) demonstrating changes in the optimized LegNet.
+
 - [Scripts](scripts/paper) to reproduce the analysis presented in the LegNet manuscript based on the public GPRA data of [Vaishnav et al.](https://doi.org/10.1038/s41586-022-04506-6), [Zenodo](https://zenodo.org/record/4436477#.Y5R6IOxBy3J).
 
 - [Scripts](scripts/dream2022) to reproduce the autosome.org solution for the [DREAM 2022 promoter expression challenge](https://www.synapse.org/#!Synapse:syn28469146/wiki/619131).
