@@ -8,7 +8,7 @@ For detailed description of all the changes introduced to the original approach 
 
 | Parameter                 | Default       | Type/Action | Description   |	
 | :------------------------ |:-------------:| :-------------:| :-------------|
-| --seed 	       |	-           | int |random seed
+| `--seed` 	       |	-           | int |random seed
 | --train_log_step          | 1000           | int |frequency of steps with which to save snapshots during the train epoch
 | <td colspan=3>model architecture parameters
 | --use_single_channel 	       |	- | store_true	            |if True, singleton augmentation will be performed
