@@ -1,20 +1,20 @@
- python train.py --seed 42\
+python LegNet/dream_ablation/train.py --seed 42\
   --use_single_channel\
   --use_reverse_channel\
   --kernel_size 7\
-  --filter_per_group 2\
+  --filter_per_group 1\
   --res_block_type concat\
-  --se_type complex\
-  --inner_dim_calculation out\
-  --final_activation silu\
+  --se_type simple\
+  --inner_dim_calculation "in"\
+  --final_activation none\
   --blocks 256 128 128 64 64 64 64\
   --train_mode classification\
-  --optimizer adamw\
+  --optimizer lion\
   --scheduler onecycle\
-  --lr 0.005\
-  --wd 0.01\
-  --split_type trainvalid\
-  --dataset_path "/home/penzard/dream_data/dreamdata/contest_data/train_sequences.txt"\
+  --lr 0.0005\
+  --wd 0.1\
+  --split_type fulltrain\
+  --dataset_path "train_sequences.txt"\
   --reverse_augment\
-  --model_dir try\
-  --valid_folds 9
+  --model_dir LegNet/models/optimized\
+  --precision '16-mixed'
