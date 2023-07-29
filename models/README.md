@@ -2,4 +2,4 @@ Model weights for an original LegNet model are located in [complex](complex) and
 
 Model weights for a diffusion model are located in [diffusion](../diffusion/models/) folder. 
 
-Model weights for an optimized LegNet architecture are located in [optimized](optimized) folder. These are compatible with PyTorch Lightning code which can be found in [ablation code](../dream_ablation/) and in the corresponding [tutorial](../tutorial/demo_notebook_optimized.ipynb).
+Model weights for an optimized LegNet architecture are located in the [optimized](optimized) folder. These are compatible with PyTorch Lightning code which can be found in [ablation code](../dream_ablation/) and in the corresponding [tutorial](../tutorial/demo_notebook_optimized.ipynb).
