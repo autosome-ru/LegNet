@@ -333,9 +333,10 @@ args = parser.parse_args()
 
 print("Loading model...")
 device = torch.device(f"cuda:{args.gpu}")
+print(device)
 model = SeqNN(seqsize=args.seqsize, use_single_channel=args.use_single_channel, block_sizes= args.blocks, ks=args.ks, 
               resize_factor=args.resize_factor, se_reduction=args.se_reduction, final_ch=args.final_ch).to(device)
-model.load_state_dict(torch.load(args.model))
+model.load_state_dict(torch.load(args.model, map_location=device))
 model.eval()
 
 
