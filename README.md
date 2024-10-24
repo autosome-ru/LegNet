@@ -2,7 +2,7 @@
 
 Dmitry Penzar, Daria Nogina et al., LegNet: a best-in-class deep learning model for short DNA regulatory regions, Bioinformatics, 2023; doi: 10.1093/bioinformatics/btad457
 
-[[`Paper`](https://doi.org/10.1093/bioinformatics/btad457)] [[`Preprint`](https://www.biorxiv.org/content/10.1101/2022.12.22.521582v2)]
+[[`Paper`](https://doi.org/10.1093/bioinformatics/btad457)] [[`Preprint`](https://www.biorxiv.org/content/10.1101/2022.12.22.521582v2)] [[`Application to the human data`](https://github.com/autosome-ru/human_legnet)]
 
 Here we present a convolutional network for predicting gene expression and sequence variant effects based on data obtained by large-scale parallel reporter assays. 
 
