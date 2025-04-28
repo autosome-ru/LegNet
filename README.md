@@ -14,7 +14,7 @@ Furthermore, we demonstrate how LegNet can be used in [diffusion generative mode
 
 - A [tutorial Jupyter notebook](tutorial/demo_notebook.ipynb) demonstrating how LegNet can be practically used with the data from yeast gigantic parallel reporter assays.
 
-- A [tutorial Jupyter notebook](tutorial/demo_notebook_optimized.ipynb) demonstrating changes in the optimized LegNet.
+- A [tutorial Jupyter notebook](tutorial/demo_notebook_optimized.ipynb) demonstrating changes in the optimized LegNet. We HIGHLY RECOMMEND to use the optimized version of the model as a more stable architecture with better performance across many tasks. Also, for regression tasks we HIGHLY RECOMMEND to use an architecture from human_legnet[https://github.com/autosome-ru/human_legnet] repository
 
 - [Code](./diffusion/) for diffusion generative modeling.
 
